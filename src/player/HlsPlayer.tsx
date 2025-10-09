@@ -1,24 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
-import { useHlsSupported } from './hls-hooks';
-
-const STREAM_URL = '';
+import { useIptvPlaylist } from '../playlist-view/use-iptv-playlist';
 
 export const HlsPlayer: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
+    const channel = useIptvPlaylist(state => state.channel!); // Assuming your Zustand store has a channel state
     const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
-        if (useHlsSupported()) {
+        // Check if Safari supports playing HLS natively
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            console.log('using native hls');
+            video.src = channel.url;
+            handlePlay();
+            return;
+        } else if (Hls.isSupported()) {
             console.log('attaching video');
             const hls = new Hls();
-            hls.loadSource(STREAM_URL);
+            hls.loadSource(channel.url);
             hls.attachMedia(video);
+            handlePlay();
+        } else {
+            console.error('nu i pizduy');
         }
         
-    }, [videoRef]);
+    }, [videoRef, channel]);
 
     const handlePlay = () => {
         videoRef.current?.play();
@@ -30,17 +38,10 @@ export const HlsPlayer: React.FC = () => {
         setIsPlaying(false);
     };
 
-    const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (videoRef.current) {
-            videoRef.current.currentTime = Number(e.target.value);
-        }
-    };
-
     return (
         <div className="hls-player" role="region" aria-label="HLS player">
             <video
                 ref={videoRef}
-                src={STREAM_URL}
                 controls={false}
                 className="hls-video"
                 style={{ background: '#000' }}

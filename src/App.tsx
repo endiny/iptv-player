@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import {HlsPlayer} from './player/HlsPlayer'
+import Main from './playlist-view/Main'
+import { Route, Routes } from 'react-router'
+import { HlsPlayer } from './player/HlsPlayer'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-      <HlsPlayer />
+    <Routes>
+      <Route path="/" element={<Main />} />
+      <Route path="/player" element={<HlsPlayer />} />
+    </Routes>
   )
 }
 
