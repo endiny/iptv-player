@@ -12,7 +12,6 @@ export const HlsPlayer: React.FC = () => {
     console.log(channel);
     console.log(currentProgramme);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [overlayActive, setOverlayActive] = useState(false);
 
     // Safely read possibly-untyped playlist fields
     const logoSrc = channel?.tvg?.logo ?? '';
@@ -37,7 +36,7 @@ export const HlsPlayer: React.FC = () => {
         } else {
             console.error('nu i pizduy');
         }
-        
+
     }, [videoRef, channel]);
 
     const handlePlay = () => {
@@ -50,15 +49,12 @@ export const HlsPlayer: React.FC = () => {
         setIsPlaying(false);
     };
 
-    const showGradient = isPlaying && overlayActive;
 
     return (
         <div
-            className={`hls-player ${showGradient ? 'show-gradient' : ''}`}
+            className={`hls-player show-gradient`}
             role="region"
             aria-label="HLS player"
-            onMouseEnter={() => setOverlayActive(true)}
-            onMouseLeave={() => setOverlayActive(false)}
         >
             <video
                 ref={videoRef}
@@ -73,31 +69,32 @@ export const HlsPlayer: React.FC = () => {
                 tabIndex={0}
                 role="region"
                 aria-label="Player controls"
-                onFocus={() => setOverlayActive(true)}
-                onBlur={() => setOverlayActive(false)}
             >
                 <div className="overlay-info" aria-hidden={isPlaying}>
-                    {logoSrc ? (
-                        <img className="channel-icon" src={logoSrc} alt={`${channelDisplayName || 'Channel'} logo`} />
-                    ) : null}
+                    <div className='channel-meta'>
+                        {logoSrc ? (
+                            <img className="channel-icon" src={logoSrc} alt={`${channelDisplayName || 'Channel'} logo`} />
+                        ) : null}
 
-                    <div className="channel-meta">
-                        <div className="channel-name">{channelDisplayName}</div>
-                        <div className="current-programme">
-                            🔴&nbsp;
-                            {(currentProgramme?.start && currentProgramme.stop) && <span>[{formatTime(currentProgramme.start)}:{formatTime(currentProgramme.stop)}]&nbsp;</span>}
-                            {programmeTitle && <span>{programmeTitle}</span>}
+                        <div className="channel-text">
+                            <div className="channel-name">{channelDisplayName}</div>
+                            <div className="current-programme">
+                                🔴&nbsp;
+                                {(currentProgramme?.start && currentProgramme.stop) && <span>[{formatTime(currentProgramme.start)}:{formatTime(currentProgramme.stop)}]&nbsp;</span>}
+                                {programmeTitle && <span>{programmeTitle}</span>}
+                            </div>
                         </div>
+                    </div>
+                    <div className="controls-row">
+                        {isPlaying ? (
+                            <button className="play-button" onClick={handlePause} aria-label="Pause video">Pause</button>
+                        ) : (
+                            <button className="play-button" onClick={handlePlay} aria-label="Play video">Play</button>
+                        )}
                     </div>
                 </div>
 
-                <div className="controls-row">
-                    {isPlaying ? (
-                        <button className="play-button" onClick={handlePause} aria-label="Pause video">Pause</button>
-                    ) : (
-                        <button className="play-button" onClick={handlePlay} aria-label="Play video">Play</button>
-                    )}
-                </div>
+
             </div>
         </div>
     );
