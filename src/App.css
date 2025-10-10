@@ -59,6 +59,35 @@
   background: #000;
 }
 
+/* subtle gradient from black up to transparent so white text is readable */
+.hls-player::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* increase coverage so the gradient reaches well past the channel meta on large screens */
+  height: clamp(240px, 28vh, 640px);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+  /* stronger opaque region and longer fade so text sits on darker background */
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.9) 20%,
+    rgba(0,0,0,0.75) 40%,
+    rgba(0,0,0,0.45) 65%,
+    rgba(0,0,0,0.12) 85%,
+    transparent 100%
+  );
+}
+
+.hls-player.show-gradient::before {
+  opacity: 1;
+}
+
 .controls-overlay {
   position: absolute;
   left: 0;
@@ -67,6 +96,7 @@
   display: flex;
   justify-content: center;
   pointer-events: none; /* allow clicks to pass through except on the button */
+  z-index: 2; /* place controls above the gradient */
 }
 
 .play-button {
@@ -82,4 +112,60 @@
 
 .play-button:hover {
   background: rgba(0,0,0,0.75);
+}
+
+/* Top row above the controls: channel icon + name + current programme */
+.overlay-info {
+  position: absolute;
+  left: 24px;
+  bottom: 84px; /* sits above the controls row */
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: #fff;
+  pointer-events: none; /* purely informational */
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 180ms ease-in-out, transform 180ms ease-in-out;
+}
+
+.channel-icon {
+  /* slightly larger and responsive for big screens */
+  width: clamp(56px, 6.5vw, 96px);
+  height: clamp(56px, 6.5vw, 96px);
+  object-fit: contain;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+}
+
+.channel-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  /* ensure text is left-aligned when overlay is centered */
+  align-items: flex-start;
+  text-align: left;
+}
+
+.channel-name {
+  /* larger, responsive font suitable for TVs */
+  font-size: clamp(1.25rem, 3.2vw, 2rem);
+  font-weight: 700;
+}
+
+.current-programme {
+  /* slightly smaller than the channel name but still large for visibility */
+  font-size: clamp(1rem, 2.4vw, 1.4rem);
+  color: rgba(255,255,255,0.92);
+  opacity: 0.98;
+}
+
+/* Reveal both overlay-info and controls when hovering player or focusing */
+.hls-player:hover .overlay-info,
+.hls-player:hover .controls-overlay,
+.controls-overlay:focus-within .overlay-info,
+.controls-overlay:focus-within {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
