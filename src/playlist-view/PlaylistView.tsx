@@ -12,7 +12,7 @@ const PlaylistView: React.FC = () => {
       <ul>
         {playlist.items.map((entry, index) => (
           <li key={index} onClick={() => {
-            setChannel(entry);
+            setChannel(index);
             navigate('/player');
           }}>
             {entry.name}
