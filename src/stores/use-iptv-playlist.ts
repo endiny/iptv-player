@@ -1,6 +1,7 @@
 import type { Playlist, PlaylistItem } from "iptv-playlist-parser";
 import { parse } from "iptv-playlist-parser";
 import { create } from "zustand";
+import { useEpg } from "./use-epg";
 
 interface IptvPlaylistState {
   playlist: Playlist | null;
@@ -15,6 +16,7 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set) => {
   let restoredPlaylist: Playlist | null = null;
   if (savedPlaylistStr) {
     restoredPlaylist = JSON.parse(savedPlaylistStr) as Playlist;
+    fetchEpgFromPlaylist(restoredPlaylist);
   }
     
   return {
@@ -29,6 +31,8 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set) => {
         const data = await response.text();
         const parsed = parse(data);
         localStorage.setItem("iptv-playlist", JSON.stringify(parsed));
+        fetchEpgFromPlaylist(parsed);
+
         set({
           playlist: parsed,
         });
@@ -41,3 +45,11 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set) => {
     clearPlaylist: () => set({ playlist: null }),
   };
 });
+
+function fetchEpgFromPlaylist(playlist: Playlist) {
+  const epg = (playlist.header.attrs["x-tvg-url"] ?? (playlist.header.attrs as Record<string, string>)["url-tvg"] ?? '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+  useEpg.getState().fetchEpg(epg);
+}
