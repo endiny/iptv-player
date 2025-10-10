@@ -6,12 +6,13 @@ import { useEpg } from "./use-epg";
 interface IptvPlaylistState {
   playlist: Playlist | null;
   channel: PlaylistItem | null;
+  currentChannel: number;
   fetchPlaylist: (url: string) => Promise<void>;
-  setChannel: (channel: PlaylistItem) => void;
+  setChannel: (index: number) => void;
   clearPlaylist: () => void;
 }
   
-export const useIptvPlaylist = create<IptvPlaylistState>((set) => {
+export const useIptvPlaylist = create<IptvPlaylistState>((set, get) => {
   const savedPlaylistStr = localStorage.getItem("iptv-playlist");
   let restoredPlaylist: Playlist | null = null;
   if (savedPlaylistStr) {
@@ -22,6 +23,7 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set) => {
   return {
     playlist: restoredPlaylist,
     channel: null,
+    currentChannel: 0,
     fetchPlaylist: async (url: string) => {
       try {
         const response = await fetch(url);
@@ -41,7 +43,10 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set) => {
         set({ playlist: null });
       }
     },
-    setChannel: (channel: PlaylistItem) => set({ channel }),
+    setChannel: (index: number) => {
+      const size = get().playlist?.items.length ?? 1;
+      set({ channel: get().playlist?.items.at(index % size), currentChannel: index % size})
+    },
     clearPlaylist: () => set({ playlist: null }),
   };
 });
