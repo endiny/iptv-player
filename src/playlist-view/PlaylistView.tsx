@@ -1,5 +1,5 @@
 import React from 'react';
-import { useIptvPlaylist } from './use-iptv-playlist'; // Adjust the import based on your store file location
+import { useIptvPlaylist } from '../stores/use-iptv-playlist'; // Adjust the import based on your store file location
 import { useNavigate } from 'react-router';
 
 const PlaylistView: React.FC = () => {
