@@ -7,8 +7,17 @@ export const HlsPlayer: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const channel = useIptvPlaylist(state => state.channel!);
     const epg = useEpg(state => state.epgStore);
+    const currentProgramme = useEpg(state => state.getCurrentProgramme(channel?.tvg.id || ''));
     console.log(epg);
+    console.log(channel);
+    console.log(currentProgramme);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [overlayActive, setOverlayActive] = useState(false);
+
+    // Safely read possibly-untyped playlist fields
+    const logoSrc = channel?.tvg?.logo ?? '';
+    const channelDisplayName = channel?.name || channel?.tvg?.name || '';
+    const programmeTitle = currentProgramme?.title[0]?._value ?? '';
 
     useEffect(() => {
         const video = videoRef.current;
@@ -41,8 +50,16 @@ export const HlsPlayer: React.FC = () => {
         setIsPlaying(false);
     };
 
+    const showGradient = isPlaying && overlayActive;
+
     return (
-        <div className="hls-player" role="region" aria-label="HLS player">
+        <div
+            className={`hls-player ${showGradient ? 'show-gradient' : ''}`}
+            role="region"
+            aria-label="HLS player"
+            onMouseEnter={() => setOverlayActive(true)}
+            onMouseLeave={() => setOverlayActive(false)}
+        >
             <video
                 ref={videoRef}
                 controls={false}
@@ -50,13 +67,44 @@ export const HlsPlayer: React.FC = () => {
                 style={{ background: '#000' }}
             />
 
-            <div className="controls-overlay" aria-hidden={isPlaying}>
-                {isPlaying ? (
-                    <button className="play-button" onClick={handlePause} aria-label="Pause video">Pause</button>
-                ) : (
-                    <button className="play-button" onClick={handlePlay} aria-label="Play video">Play</button>
-                )}
+            <div
+                className="controls-overlay"
+                aria-hidden={isPlaying}
+                tabIndex={0}
+                role="region"
+                aria-label="Player controls"
+                onFocus={() => setOverlayActive(true)}
+                onBlur={() => setOverlayActive(false)}
+            >
+                <div className="overlay-info" aria-hidden={isPlaying}>
+                    {logoSrc ? (
+                        <img className="channel-icon" src={logoSrc} alt={`${channelDisplayName || 'Channel'} logo`} />
+                    ) : null}
+
+                    <div className="channel-meta">
+                        <div className="channel-name">{channelDisplayName}</div>
+                        <div className="current-programme">
+                            🔴&nbsp;
+                            {(currentProgramme?.start && currentProgramme.stop) && <span>[{formatTime(currentProgramme.start)}:{formatTime(currentProgramme.stop)}]&nbsp;</span>}
+                            {programmeTitle && <span>{programmeTitle}</span>}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="controls-row">
+                    {isPlaying ? (
+                        <button className="play-button" onClick={handlePause} aria-label="Pause video">Pause</button>
+                    ) : (
+                        <button className="play-button" onClick={handlePlay} aria-label="Play video">Play</button>
+                    )}
+                </div>
             </div>
         </div>
     );
 };
+
+function formatTime(date: Date): string {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+}
