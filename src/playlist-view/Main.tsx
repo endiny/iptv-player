@@ -1,5 +1,5 @@
 import React from 'react';
-import { useIptvPlaylist } from './use-iptv-playlist'; // Adjust the import path as necessary
+import { useIptvPlaylist } from '../stores/use-iptv-playlist'; // Adjust the import path as necessary
 import PlaylistUpload from './PlaylistUpload';
 import PlaylistView from './PlaylistView';
 

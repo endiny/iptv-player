@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
-import { useIptvPlaylist } from '../playlist-view/use-iptv-playlist';
+import { useIptvPlaylist } from '../stores/use-iptv-playlist';
+import { useEpg } from '../stores/use-epg';
 
 export const HlsPlayer: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const channel = useIptvPlaylist(state => state.channel!); // Assuming your Zustand store has a channel state
+    const channel = useIptvPlaylist(state => state.channel!);
+    const epg = useEpg(state => state.epgStore);
+    console.log(epg);
     const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {

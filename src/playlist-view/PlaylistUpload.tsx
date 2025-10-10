@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import parser from 'iptv-playlist-parser';
-import { useIptvPlaylist } from './use-iptv-playlist';
+import { useIptvPlaylist } from '../stores/use-iptv-playlist';
 
 const PlaylistUpload: React.FC = () => {
   const { fetchPlaylist } = useIptvPlaylist();
