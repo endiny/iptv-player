@@ -5,6 +5,7 @@ import { useEpg } from "../stores/use-epg";
 
 export const HlsPlayer: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls>(null);
   const channel = useIptvPlaylist((state) => state.channel!);
   const channelNumber = useIptvPlaylist((state) => state.currentChannel);
   const setChannel = useIptvPlaylist((state) => state.setChannel);
@@ -34,20 +35,30 @@ export const HlsPlayer: React.FC = () => {
     } else if (Hls.isSupported()) {
       console.log("attaching video");
       const hls = new Hls();
+      hlsRef.current = hls;
       hls.loadSource(channel.url);
       hls.attachMedia(video);
       handlePlay();
     } else {
       console.error("nu i pizduy");
     }
+    return () => {
+      console.log("detaching video");
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
   }, [videoRef, channel]);
 
   const handlePlay = () => {
+    console.log(hlsRef.current);
+    hlsRef.current?.startLoad();
     videoRef.current?.play();
     setIsPlaying(true);
   };
 
   const handlePause = () => {
+    console.log(hlsRef.current);
+    hlsRef.current?.stopLoad();
     videoRef.current?.pause();
     setIsPlaying(false);
   };
@@ -72,6 +83,7 @@ export const HlsPlayer: React.FC = () => {
         controls={false}
         className="hls-video"
         style={{ background: "#000" }}
+        preload="none"
       />
 
       <div
