@@ -23,7 +23,7 @@ export const useEpg = create<EpgState>((set, get) => {
         return;
       }
 
-      const fetchPromises = urls.map(wrapWithProxyIfWhitelisted).map((url) =>
+      const fetchPromises = urls.map((url) =>
         fetch(url)
           .then((res) => ({ res, url }))
       );
@@ -70,14 +70,6 @@ export const useEpg = create<EpgState>((set, get) => {
     },
   };
 });
-
-const corsProxy = 'https://api.thebugging.com/cors-proxy?';
-
-const proxyWhitelist = new Set<string>([
-  'https://epg.freejptv.com/jp.xml',
-]);
-
-const wrapWithProxyIfWhitelisted = (url: string) => proxyWhitelist.has(url) ? `${corsProxy}${url}` : url;
 
 type ProgrammesIndex = ReadonlyMap<string, ReadonlyMap<string, readonly XmltvProgramme[]>>;
 
