@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { useIptvPlaylist } from "../stores/use-iptv-playlist";
 import { useEpg } from "../stores/use-epg";
+import { PlayerOverlay } from "./PlayerOverlay";
+import { PlayerControls } from "./PlayerControls";
 
 export const HlsPlayer: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -74,7 +76,7 @@ export const HlsPlayer: React.FC = () => {
 
   return (
     <div
-      className={`hls-player show-gradient`}
+      className={`hls-player`}
       role="region"
       aria-label="HLS player"
     >
@@ -86,7 +88,9 @@ export const HlsPlayer: React.FC = () => {
         preload="none"
       />
 
-      <div
+      <PlayerOverlay bottomPanel={<PlayerControls />} />
+
+      {/* <div
         className="controls-overlay"
         aria-hidden={isPlaying}
         tabIndex={0}
@@ -151,7 +155,7 @@ export const HlsPlayer: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
