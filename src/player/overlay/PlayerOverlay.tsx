@@ -1,4 +1,4 @@
-interface PlayerOverlayProps {
+interface P {
   bottomPanel: React.ReactNode;
   topPanel?: React.ReactNode;
   leftPanel?: React.ReactNode;
@@ -6,8 +6,8 @@ interface PlayerOverlayProps {
   centerPanel?: React.ReactNode;
 }
 
-export const PlayerOverlay: React.FC<PlayerOverlayProps> = (props) => {
-  return <div className="flex flex-col h-full w-full fixed">
+export const PlayerOverlay: React.FC<P> = (props) => {
+  return <div className="flex flex-col h-full w-full fixed text-white">
     {<div className="flex-none">{props.topPanel}</div>}
     <div className="flex-grow flex">
       {<div className="flex-none">{props.leftPanel}</div>}
