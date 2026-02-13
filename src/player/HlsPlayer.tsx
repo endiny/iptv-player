@@ -4,11 +4,13 @@ import { PlayerOverlay } from "./overlay/PlayerOverlay";
 import { PlayerControls } from "./overlay/PlayerControls";
 import { usePlayer } from "./usePlayer";
 import { ChannelDetails } from "./overlay/ChannelDetails";
+import { Link } from "react-router";
 
 export const HlsPlayer: React.FC = () => {
-  const channel = useIptvPlaylist((state) => state.channel!);
+  const channel = useIptvPlaylist((state) => state.channel);
   const { videoRef, handlePlayPause, setVolume } = usePlayer(channel);
   const containerRef = useRef<HTMLDivElement>(null);
+
   const goFullScreen = () => {
     if (document.fullscreenElement === null) {
       containerRef.current?.requestFullscreen();
@@ -16,6 +18,15 @@ export const HlsPlayer: React.FC = () => {
       document.exitFullscreen();
     }
   };
+
+  if (!channel) {
+    return (
+      <div className="p-4">
+        <p>No channel selected.</p>
+        <Link to="/">Go back to playlist</Link>
+      </div>
+    );
+  }
 
   return (
     <div
