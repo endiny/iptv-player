@@ -1,12 +1,15 @@
 #root {
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* HLS player styles */
 .hls-player {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: stretch;
   justify-content: stretch;

@@ -9,7 +9,7 @@ interface P {
 }
 
 const controlButtonClass =
-  "flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg text-white transition hover:bg-black/60";
+  "flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-black/30 text-base text-white transition hover:bg-black/60 sm:h-10 sm:w-10 sm:text-lg";
 
 export const PlayerControls: React.FC<P> = (p) => {
   const { currentChannel, setChannel } = useIptvPlaylist(
@@ -25,8 +25,8 @@ export const PlayerControls: React.FC<P> = (p) => {
   };
 
   return (
-    <div className="flex items-end justify-between gap-4 px-4 py-3 md:px-6">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-3 px-3 py-3 sm:px-4 md:px-6">
+      <div className="flex items-center justify-center gap-2 sm:justify-start">
         <button className={controlButtonClass} onClick={goBack} aria-label="Previous channel" title="Previous channel">
           ⏮
         </button>
@@ -38,12 +38,12 @@ export const PlayerControls: React.FC<P> = (p) => {
         </button>
       </div>
 
-      <div className="flex items-center gap-2 self-end">
+      <div className="flex items-center justify-center gap-2 sm:self-end">
         <span className="text-sm" aria-hidden>
           🔊
         </span>
         <input
-          className="h-1 w-24 cursor-pointer accent-white md:w-32"
+          className="h-1 w-28 max-w-[36vw] cursor-pointer accent-white sm:w-24 sm:max-w-none md:w-32"
           type="range"
           min={0}
           max={100}

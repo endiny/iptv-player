@@ -65,10 +65,12 @@ export const HlsPlayer: React.FC = () => {
       aria-label="HLS player"
       onMouseMove={showOverlay}
       onMouseEnter={showOverlay}
+      onTouchStart={showOverlay}
+      onClick={showOverlay}
     >
       <Link
         to="/"
-        className="absolute left-4 top-4 z-20 rounded-full border border-white/40 bg-black/45 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-black/70"
+        className="absolute left-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm transition hover:bg-black/70 sm:left-4 sm:top-4 sm:px-4 sm:text-sm"
       >
         ← Channels list
       </Link>
@@ -84,7 +86,7 @@ export const HlsPlayer: React.FC = () => {
       <PlayerOverlay
         className={`pointer-events-none transition-opacity duration-300 ${isOverlayVisible ? "opacity-100" : "opacity-0"}`}
         bottomPanel={
-          <div className="pointer-events-auto mt-auto bg-gradient-to-t from-black/70 via-black/45 to-transparent pb-3">
+          <div className="pointer-events-auto mt-auto bg-gradient-to-t from-black/70 via-black/45 to-transparent pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:pb-3">
             <ChannelDetails />
             <PlayerControls
               isPlaying={isPlaying}
