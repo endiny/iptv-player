@@ -2,10 +2,14 @@ import { useIptvPlaylist } from "@/stores/use-iptv-playlist";
 import { useShallow } from "zustand/react/shallow";
 
 interface P {
+  isPlaying: boolean;
   onPlayPause: () => void;
   onFullScreen: () => void;
   onVolumeChange: (value: number) => void;
 }
+
+const controlButtonClass =
+  "flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg text-white transition hover:bg-black/60";
 
 export const PlayerControls: React.FC<P> = (p) => {
   const { currentChannel, setChannel } = useIptvPlaylist(
@@ -21,16 +25,35 @@ export const PlayerControls: React.FC<P> = (p) => {
   };
 
   return (
-    <div className="flex justify-between space-x-4 p-4 ">
-      <div></div>
-      <div className="flex gap-3">
-        <button onClick={goBack}>Prev</button>
-        <button onClick={p.onPlayPause}>Play/Pause</button>
-        <button onClick={goNext}>Next</button>
+    <div className="flex items-end justify-between gap-4 px-4 py-3 md:px-6">
+      <div className="flex items-center gap-2">
+        <button className={controlButtonClass} onClick={goBack} aria-label="Previous channel" title="Previous channel">
+          ⏮
+        </button>
+        <button className={controlButtonClass} onClick={p.onPlayPause} aria-label={p.isPlaying ? "Pause" : "Play"} title={p.isPlaying ? "Pause" : "Play"}>
+          {p.isPlaying ? "⏸" : "▶"}
+        </button>
+        <button className={controlButtonClass} onClick={goNext} aria-label="Next channel" title="Next channel">
+          ⏭
+        </button>
       </div>
-      <div>
-        <input type="range" min={0} max={100} defaultValue={100} onChange={e => p.onVolumeChange(e.currentTarget.valueAsNumber / 100)}/>
-        <button onClick={p.onFullScreen}>FS</button>
+
+      <div className="flex items-center gap-2 self-end">
+        <span className="text-sm" aria-hidden>
+          🔊
+        </span>
+        <input
+          className="h-1 w-24 cursor-pointer accent-white md:w-32"
+          type="range"
+          min={0}
+          max={100}
+          defaultValue={100}
+          onChange={(e) => p.onVolumeChange(e.currentTarget.valueAsNumber / 100)}
+          aria-label="Volume"
+        />
+        <button className={controlButtonClass} onClick={p.onFullScreen} aria-label="Toggle fullscreen" title="Toggle fullscreen">
+          ⛶
+        </button>
       </div>
     </div>
   );
