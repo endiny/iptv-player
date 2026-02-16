@@ -66,6 +66,13 @@ export const HlsPlayer: React.FC = () => {
       onMouseMove={showOverlay}
       onMouseEnter={showOverlay}
     >
+      <Link
+        to="/"
+        className="absolute left-4 top-4 z-20 rounded-full border border-white/40 bg-black/45 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-black/70"
+      >
+        ← Channels list
+      </Link>
+
       <video
         ref={videoRef}
         controls={false}
