@@ -12,19 +12,19 @@ export const ChannelDetails: React.FC = () => {
   const programmeTitle = currentProgramme?.title[0]?._value ?? "No programme information";
 
   return (
-    <div className="mx-4 mb-2 flex items-center gap-3 rounded-lg bg-black/50 p-3 backdrop-blur-sm md:mx-6 md:max-w-3xl">
+    <div className="mx-3 mb-2 flex items-center gap-2 rounded-lg bg-black/50 p-2.5 backdrop-blur-sm sm:mx-4 sm:gap-3 sm:p-3 md:mx-6 md:max-w-3xl">
       {logoSrc ? (
         <img
-          className="h-14 w-14 rounded object-cover md:h-16 md:w-16"
+          className="h-11 w-11 rounded object-cover sm:h-14 sm:w-14 md:h-16 md:w-16"
           src={logoSrc}
           alt={`${channelDisplayName || "Channel"} logo`}
         />
       ) : (
-        <div className="flex h-14 w-14 items-center justify-center rounded bg-white/10 text-xl md:h-16 md:w-16">📺</div>
+        <div className="flex h-11 w-11 items-center justify-center rounded bg-white/10 text-lg sm:h-14 sm:w-14 sm:text-xl md:h-16 md:w-16">📺</div>
       )}
       <div className="min-w-0 text-left">
-        <div className="truncate text-base font-semibold md:text-lg">{channelDisplayName}</div>
-        <div className="truncate text-sm text-white/90">
+        <div className="truncate text-sm font-semibold sm:text-base md:text-lg">{channelDisplayName}</div>
+        <div className="truncate text-xs text-white/90 sm:text-sm">
           {currentProgramme?.start && currentProgramme?.stop && (
             <span>
               🔴 {formatTime(currentProgramme.start)}-{formatTime(currentProgramme.stop)} ·{" "}
