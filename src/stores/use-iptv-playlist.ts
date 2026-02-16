@@ -30,7 +30,12 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set, get) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch playlist: ${response.statusText}`);
         }
-        const data = await response.text();
+        let data = await response.text();
+        try {
+          data = atob(data);
+        } catch {
+          // Not base64, ignore
+        }
         const parsed = parse(data);
         localStorage.setItem("iptv-playlist", JSON.stringify(parsed));
         fetchEpgFromPlaylist(parsed);
