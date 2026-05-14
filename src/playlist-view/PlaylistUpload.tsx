@@ -3,6 +3,9 @@ import { useIptvPlaylist } from '../stores/use-iptv-playlist';
 
 type Mode = 'url' | 'file';
 
+const loadButtonClass =
+  "h-11 rounded-xl border border-sky-300/40 bg-sky-500/20 px-5 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/35 disabled:cursor-not-allowed disabled:opacity-50";
+
 const PlaylistUpload: React.FC = () => {
   const { fetchPlaylist, loadPlaylistFromFile } = useIptvPlaylist();
   const [mode, setMode] = useState<Mode>('url');
@@ -103,7 +106,7 @@ const PlaylistUpload: React.FC = () => {
                   onChange={event => setPlaylistUrl(event.target.value)}
                 />
                 <button
-                  className="h-11 rounded-xl border border-sky-300/40 bg-sky-500/20 px-5 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/35 disabled:cursor-not-allowed disabled:opacity-50"
+                  className={loadButtonClass}
                   onClick={handleFetchPlaylist}
                   disabled={isLoading}
                   type="button"
@@ -120,7 +123,7 @@ const PlaylistUpload: React.FC = () => {
                   onChange={event => setSelectedFile(event.target.files?.[0] ?? null)}
                 />
                 <button
-                  className="h-11 rounded-xl border border-sky-300/40 bg-sky-500/20 px-5 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/35 disabled:cursor-not-allowed disabled:opacity-50"
+                  className={loadButtonClass}
                   onClick={handleFileLoad}
                   disabled={isLoading || !selectedFile}
                   type="button"

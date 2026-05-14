@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIptvPlaylist } from '../stores/use-iptv-playlist';
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router';
 import type { PlaylistItem } from 'iptv-playlist-parser';
 
 const CHANNELS_PER_PAGE = 16;
 const ALL_CATEGORIES = 'All categories';
+const paginationButtonClass =
+  "rounded-md border border-white/20 px-4 py-2 text-sm transition enabled:hover:border-sky-400 enabled:hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40";
 
 type CategorizedChannel = {
   entry: PlaylistItem;
@@ -72,7 +74,8 @@ const PlaylistView: React.FC = () => {
             <p className="text-sm text-slate-300">Browse by category and open channels instantly.</p>
           </div>
 
-          <label className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-sm">
             <span className="text-slate-300">Category:</span>
             <select
               className="rounded-md border border-white/20 bg-slate-900/80 px-3 py-2 text-sm text-white"
@@ -88,7 +91,14 @@ const PlaylistView: React.FC = () => {
                 </option>
               ))}
             </select>
-          </label>
+            </label>
+            <Link
+              to="/settings"
+              className="rounded-md border border-white/20 px-3 py-2 text-sm text-slate-300 transition hover:border-sky-400 hover:text-sky-300"
+            >
+              Settings
+            </Link>
+          </div>
         </div>
 
         <div className="grid gap-3 md:grid-cols-4">
@@ -125,7 +135,7 @@ const PlaylistView: React.FC = () => {
 
         <div className="flex items-center justify-between rounded-xl bg-slate-900/70 p-3">
           <button
-            className="rounded-md border border-white/20 px-4 py-2 text-sm transition enabled:hover:border-sky-400 enabled:hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40"
+            className={paginationButtonClass}
             onClick={() => {
               setCurrentPage(page => Math.max(1, page - 1));
             }}
@@ -140,7 +150,7 @@ const PlaylistView: React.FC = () => {
           </span>
 
           <button
-            className="rounded-md border border-white/20 px-4 py-2 text-sm transition enabled:hover:border-sky-400 enabled:hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40"
+            className={paginationButtonClass}
             onClick={() => {
               setCurrentPage(page => Math.min(totalPages, page + 1));
             }}

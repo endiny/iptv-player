@@ -8,7 +8,7 @@ interface PlayerOverlayProps {
 }
 
 export const PlayerOverlay: React.FC<PlayerOverlayProps> = (props) => {
-  return <div className={`fixed inset-0 flex h-full w-full flex-col text-white ${props.className ?? ""}`}>
+  return <div className={`fixed inset-0 flex flex-col text-white ${props.className ?? ""}`}>
     <div className="flex-none">{props.topPanel}</div>
     <div className="flex-grow flex">
       <div className="flex-none">{props.leftPanel}</div>

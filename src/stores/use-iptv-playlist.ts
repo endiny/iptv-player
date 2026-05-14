@@ -57,7 +57,11 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set, get) => {
       const size = get().playlist?.items.length ?? 1;
       set({ channel: get().playlist?.items.at(index % size), currentChannel: index % size})
     },
-    clearPlaylist: () => set({ playlist: null }),
+    clearPlaylist: () => {
+      localStorage.removeItem("iptv-playlist");
+      useEpg.getState().clearEpg();
+      set({ playlist: null, channel: null, currentChannel: 0 });
+    },
   };
 });
 
