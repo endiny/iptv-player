@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useIptvPlaylist } from '../stores/use-iptv-playlist';
 import { PlayerOverlay } from './overlay/PlayerOverlay';
 import { PlayerControls } from './overlay/PlayerControls';
@@ -7,6 +7,8 @@ import { ChannelDetails } from './overlay/ChannelDetails';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { Icon } from '@/icons';
 import { useShallow } from 'zustand/react/shallow';
+import { useOverlayVisibility } from './useOverlayVisibility';
+import { useKeyboardShortcuts } from './useKeyboardShortcuts';
 
 const OVERLAY_IDLE_TIMEOUT_MS = 3000;
 
@@ -22,10 +24,10 @@ export const HlsPlayer: React.FC = () => {
   const { videoRef, handlePlayPause, isPlaying, isMuted, isBuffering, setVolume, toggleMute } =
     usePlayer(channel);
   const containerRef = useRef<HTMLDivElement>(null);
-  const hideOverlayTimeout = useRef<number | null>(null);
-  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  const { isOverlayVisible, showOverlay } = useOverlayVisibility(OVERLAY_IDLE_TIMEOUT_MS);
 
   const goFullScreen = useCallback(() => {
     if (document.fullscreenElement === null) {
@@ -34,29 +36,6 @@ export const HlsPlayer: React.FC = () => {
       document.exitFullscreen();
     }
   }, []);
-
-  const scheduleOverlayHide = useCallback(() => {
-    if (hideOverlayTimeout.current !== null) {
-      window.clearTimeout(hideOverlayTimeout.current);
-    }
-    hideOverlayTimeout.current = window.setTimeout(() => {
-      setIsOverlayVisible(false);
-    }, OVERLAY_IDLE_TIMEOUT_MS);
-  }, []);
-
-  const showOverlay = useCallback(() => {
-    setIsOverlayVisible(true);
-    scheduleOverlayHide();
-  }, [scheduleOverlayHide]);
-
-  useEffect(() => {
-    showOverlay();
-    return () => {
-      if (hideOverlayTimeout.current !== null) {
-        window.clearTimeout(hideOverlayTimeout.current);
-      }
-    };
-  }, [showOverlay]);
 
   // Restore channel from URL on mount
   useEffect(() => {
@@ -81,49 +60,25 @@ export const HlsPlayer: React.FC = () => {
     [playlist, setChannel, setSearchParams],
   );
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case ' ':
-          e.preventDefault();
-          handlePlayPause();
-          showOverlay();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          navigateToChannel(currentChannel - 1);
-          showOverlay();
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          navigateToChannel(currentChannel + 1);
-          showOverlay();
-          break;
-        case 'f':
-        case 'F':
-          goFullScreen();
-          break;
-        case 'm':
-        case 'M':
-          toggleMute();
-          break;
-        case 'Escape':
-          navigate('/');
-          break;
-      }
-    };
+  const onPrevChannel = useCallback(
+    () => navigateToChannel(currentChannel - 1),
+    [navigateToChannel, currentChannel],
+  );
+  const onNextChannel = useCallback(
+    () => navigateToChannel(currentChannel + 1),
+    [navigateToChannel, currentChannel],
+  );
+  const onNavigateHome = useCallback(() => navigate('/'), [navigate]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [
-    handlePlayPause,
-    showOverlay,
-    goFullScreen,
-    currentChannel,
-    navigateToChannel,
-    toggleMute,
-    navigate,
-  ]);
+  useKeyboardShortcuts({
+    onPlayPause: handlePlayPause,
+    onPrevChannel,
+    onNextChannel,
+    onFullScreen: goFullScreen,
+    onToggleMute: toggleMute,
+    onNavigateHome,
+    onShowOverlay: showOverlay,
+  });
 
   const handleContainerClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -172,8 +127,8 @@ export const HlsPlayer: React.FC = () => {
               onToggleMute={toggleMute}
               onFullScreen={goFullScreen}
               onVolumeChange={setVolume}
-              onPrev={() => navigateToChannel(currentChannel - 1)}
-              onNext={() => navigateToChannel(currentChannel + 1)}
+              onPrev={onPrevChannel}
+              onNext={onNextChannel}
             />
           </div>
         }
