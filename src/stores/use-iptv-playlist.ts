@@ -8,6 +8,7 @@ interface IptvPlaylistState {
   channel: PlaylistItem | null;
   currentChannel: number;
   fetchPlaylist: (url: string) => Promise<void>;
+  loadPlaylistFromFile: (file: File) => Promise<void>;
   setChannel: (index: number) => void;
   clearPlaylist: () => void;
 }
@@ -30,21 +31,21 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set, get) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch playlist: ${response.statusText}`);
         }
-        let data = await response.text();
-        try {
-          data = atob(data);
-        } catch {
-          // Not base64, ignore
-        }
-        const parsed = parse(data);
-        localStorage.setItem("iptv-playlist", JSON.stringify(parsed));
-        fetchEpgFromPlaylist(parsed);
-
-        set({
-          playlist: parsed,
-        });
+        const data = await response.text();
+        const parsed = processPlaylistData(data);
+        set({ playlist: parsed });
       } catch (error) {
         console.error("Error fetching playlist:", error);
+        set({ playlist: null });
+      }
+    },
+    loadPlaylistFromFile: async (file: File) => {
+      try {
+        const text = await file.text();
+        const parsed = processPlaylistData(text);
+        set({ playlist: parsed });
+      } catch (error) {
+        console.error("Error loading playlist from file:", error);
         set({ playlist: null });
       }
     },
@@ -55,6 +56,15 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set, get) => {
     clearPlaylist: () => set({ playlist: null }),
   };
 });
+
+function processPlaylistData(data: string): Playlist {
+  let text = data;
+  try { text = atob(data); } catch { /* not base64 */ }
+  const parsed = parse(text);
+  localStorage.setItem("iptv-playlist", JSON.stringify(parsed));
+  fetchEpgFromPlaylist(parsed);
+  return parsed;
+}
 
 function fetchEpgFromPlaylist(playlist: Playlist) {
   const epg = (playlist.header.attrs["x-tvg-url"] ?? (playlist.header.attrs as Record<string, string>)["url-tvg"] ?? '')
