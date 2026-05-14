@@ -4,7 +4,7 @@ import { useIptvPlaylist } from '../stores/use-iptv-playlist';
 type Mode = 'url' | 'file';
 
 const loadButtonClass =
-  "h-11 rounded-xl border border-sky-300/40 bg-sky-500/20 px-5 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/35 disabled:cursor-not-allowed disabled:opacity-50";
+  'h-11 rounded-xl border border-sky-300/40 bg-sky-500/20 px-5 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/35 disabled:cursor-not-allowed disabled:opacity-50';
 
 const PlaylistUpload: React.FC = () => {
   const { fetchPlaylist, loadPlaylistFromFile } = useIptvPlaylist();
@@ -33,7 +33,8 @@ const PlaylistUpload: React.FC = () => {
     try {
       await fetchPlaylist(normalizedUrl);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unexpected error while loading playlist.';
+      const message =
+        err instanceof Error ? err.message : 'Unexpected error while loading playlist.';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -52,7 +53,8 @@ const PlaylistUpload: React.FC = () => {
     try {
       await loadPlaylistFromFile(selectedFile);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unexpected error while loading playlist.';
+      const message =
+        err instanceof Error ? err.message : 'Unexpected error while loading playlist.';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -103,7 +105,7 @@ const PlaylistUpload: React.FC = () => {
                   type="url"
                   placeholder="https://example.com/playlist.m3u"
                   value={playlistUrl}
-                  onChange={event => setPlaylistUrl(event.target.value)}
+                  onChange={(event) => setPlaylistUrl(event.target.value)}
                 />
                 <button
                   className={loadButtonClass}
@@ -120,7 +122,7 @@ const PlaylistUpload: React.FC = () => {
                   className="flex-1 rounded-xl border border-white/20 bg-slate-900/80 px-4 py-2.5 text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-slate-700 file:px-3 file:py-1 file:text-sm file:font-medium file:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                   type="file"
                   accept=".m3u,.m3u8"
-                  onChange={event => setSelectedFile(event.target.files?.[0] ?? null)}
+                  onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
                 />
                 <button
                   className={loadButtonClass}
@@ -134,7 +136,11 @@ const PlaylistUpload: React.FC = () => {
             )}
           </div>
 
-          {error && <p className="mt-4 rounded-lg border border-rose-400/30 bg-rose-500/15 px-3 py-2 text-sm text-rose-200">{error}</p>}
+          {error && (
+            <p className="mt-4 rounded-lg border border-rose-400/30 bg-rose-500/15 px-3 py-2 text-sm text-rose-200">
+              {error}
+            </p>
+          )}
         </div>
       </div>
     </div>

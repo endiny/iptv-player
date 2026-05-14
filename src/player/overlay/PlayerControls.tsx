@@ -1,4 +1,4 @@
-import { Icon } from "@/icons";
+import { Icon } from '@/icons';
 
 interface PlayerControlsProps {
   isPlaying: boolean;
@@ -12,18 +12,33 @@ interface PlayerControlsProps {
 }
 
 const controlButtonClass =
-  "flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white transition hover:bg-black/60";
+  'flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white transition hover:bg-black/60';
 
 export const PlayerControls: React.FC<PlayerControlsProps> = (p) => (
   <div className="flex items-end justify-between gap-4 px-4 py-3 md:px-6">
     <div className="flex items-center gap-2">
-      <button className={controlButtonClass} onClick={p.onPrev} aria-label="Previous channel" title="Previous channel">
+      <button
+        className={controlButtonClass}
+        onClick={p.onPrev}
+        aria-label="Previous channel"
+        title="Previous channel"
+      >
         <Icon name="prev" />
       </button>
-      <button className={controlButtonClass} onClick={p.onPlayPause} aria-label={p.isPlaying ? "Pause" : "Play"} title={p.isPlaying ? "Pause" : "Play"}>
-        <Icon name={p.isPlaying ? "pause" : "play"} />
+      <button
+        className={controlButtonClass}
+        onClick={p.onPlayPause}
+        aria-label={p.isPlaying ? 'Pause' : 'Play'}
+        title={p.isPlaying ? 'Pause' : 'Play'}
+      >
+        <Icon name={p.isPlaying ? 'pause' : 'play'} />
       </button>
-      <button className={controlButtonClass} onClick={p.onNext} aria-label="Next channel" title="Next channel">
+      <button
+        className={controlButtonClass}
+        onClick={p.onNext}
+        aria-label="Next channel"
+        title="Next channel"
+      >
         <Icon name="next" />
       </button>
     </div>
@@ -32,10 +47,10 @@ export const PlayerControls: React.FC<PlayerControlsProps> = (p) => (
       <button
         className={controlButtonClass}
         onClick={p.onToggleMute}
-        aria-label={p.isMuted ? "Unmute" : "Mute"}
-        title={p.isMuted ? "Unmute" : "Mute"}
+        aria-label={p.isMuted ? 'Unmute' : 'Mute'}
+        title={p.isMuted ? 'Unmute' : 'Mute'}
       >
-        <Icon name={p.isMuted ? "volume-off" : "volume"} />
+        <Icon name={p.isMuted ? 'volume-off' : 'volume'} />
       </button>
       <input
         className="h-1 w-24 cursor-pointer accent-white md:w-32"
@@ -46,7 +61,12 @@ export const PlayerControls: React.FC<PlayerControlsProps> = (p) => (
         onChange={(e) => p.onVolumeChange(e.currentTarget.valueAsNumber / 100)}
         aria-label="Volume"
       />
-      <button className={controlButtonClass} onClick={p.onFullScreen} aria-label="Toggle fullscreen" title="Toggle fullscreen">
+      <button
+        className={controlButtonClass}
+        onClick={p.onFullScreen}
+        aria-label="Toggle fullscreen"
+        title="Toggle fullscreen"
+      >
         <Icon name="fullscreen" />
       </button>
     </div>

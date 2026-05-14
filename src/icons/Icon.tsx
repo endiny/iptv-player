@@ -1,11 +1,19 @@
 import React from 'react';
 
-const modules = import.meta.glob<{ default: React.FC<React.SVGProps<SVGSVGElement>> }>(
-  './*.svg',
-  { eager: true, query: '?react' }
-);
+const modules = import.meta.glob<{ default: React.FC<React.SVGProps<SVGSVGElement>> }>('./*.svg', {
+  eager: true,
+  query: '?react',
+});
 
-export type IconName = 'prev' | 'next' | 'play' | 'pause' | 'volume' | 'volume-off' | 'fullscreen' | 'spinner';
+export type IconName =
+  | 'prev'
+  | 'next'
+  | 'play'
+  | 'pause'
+  | 'volume'
+  | 'volume-off'
+  | 'fullscreen'
+  | 'spinner';
 
 interface IconProps {
   name: IconName;

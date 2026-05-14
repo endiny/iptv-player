@@ -1,6 +1,6 @@
-import Hls from "hls.js";
-import type { PlaylistItem } from "iptv-playlist-parser";
-import { useCallback, useEffect, useRef, useState } from "react";
+import Hls from 'hls.js';
+import type { PlaylistItem } from 'iptv-playlist-parser';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const STALE_PAUSE_THRESHOLD_MS = 5000;
 
@@ -36,13 +36,12 @@ export function usePlayer(channel: PlaylistItem | null) {
         hlsRef.current?.startLoad();
       }
 
-      videoRef.current.play().catch((err) => console.warn("Autoplay blocked:", err));
+      videoRef.current.play().catch((err) => console.warn('Autoplay blocked:', err));
       setIsPlaying(true);
     }
   }, [channel]);
 
-  const setVolume = (volume: number) =>
-    videoRef.current && (videoRef.current.volume = volume);
+  const setVolume = (volume: number) => videoRef.current && (videoRef.current.volume = volume);
 
   const toggleMute = useCallback(() => {
     if (!videoRef.current) return;
@@ -64,9 +63,9 @@ export function usePlayer(channel: PlaylistItem | null) {
     video.addEventListener('playing', onPlaying);
     video.addEventListener('volumechange', onVolumeChange);
 
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = channel.url;
-      video.play().catch((err) => console.warn("Autoplay blocked:", err));
+      video.play().catch((err) => console.warn('Autoplay blocked:', err));
       setIsPlaying(true);
     } else if (Hls.isSupported()) {
       const hls = new Hls();
@@ -74,10 +73,10 @@ export function usePlayer(channel: PlaylistItem | null) {
       hls.loadSource(channel.url);
       hls.attachMedia(video);
       hls.startLoad();
-      video.play().catch((err) => console.warn("Autoplay blocked:", err));
+      video.play().catch((err) => console.warn('Autoplay blocked:', err));
       setIsPlaying(true);
     } else {
-      console.error("HLS is not supported by this browser");
+      console.error('HLS is not supported by this browser');
     }
 
     return () => {
@@ -87,7 +86,7 @@ export function usePlayer(channel: PlaylistItem | null) {
       hlsRef.current?.destroy();
       hlsRef.current = null;
       video.pause();
-      video.removeAttribute("src");
+      video.removeAttribute('src');
       video.load();
     };
   }, [channel]);
