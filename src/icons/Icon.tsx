@@ -5,7 +5,7 @@ const modules = import.meta.glob<{ default: React.FC<React.SVGProps<SVGSVGElemen
   { eager: true, query: '?react' }
 );
 
-export type IconName = 'prev' | 'next' | 'play' | 'pause' | 'volume' | 'fullscreen';
+export type IconName = 'prev' | 'next' | 'play' | 'pause' | 'volume' | 'volume-off' | 'fullscreen' | 'spinner';
 
 interface IconProps {
   name: IconName;

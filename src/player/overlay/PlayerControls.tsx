@@ -2,7 +2,9 @@ import { Icon } from "@/icons";
 
 interface PlayerControlsProps {
   isPlaying: boolean;
+  isMuted: boolean;
   onPlayPause: () => void;
+  onToggleMute: () => void;
   onFullScreen: () => void;
   onVolumeChange: (value: number) => void;
   onPrev: () => void;
@@ -27,7 +29,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = (p) => (
     </div>
 
     <div className="flex items-center gap-2 self-end">
-      <Icon name="volume" />
+      <button
+        className={controlButtonClass}
+        onClick={p.onToggleMute}
+        aria-label={p.isMuted ? "Unmute" : "Mute"}
+        title={p.isMuted ? "Unmute" : "Mute"}
+      >
+        <Icon name={p.isMuted ? "volume-off" : "volume"} />
+      </button>
       <input
         className="h-1 w-24 cursor-pointer accent-white md:w-32"
         type="range"

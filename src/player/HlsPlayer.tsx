@@ -5,6 +5,7 @@ import { PlayerControls } from "./overlay/PlayerControls";
 import { usePlayer } from "./usePlayer";
 import { ChannelDetails } from "./overlay/ChannelDetails";
 import { Link, useNavigate, useSearchParams } from "react-router";
+import { Icon } from "@/icons";
 import { useShallow } from "zustand/react/shallow";
 
 const OVERLAY_IDLE_TIMEOUT_MS = 3000;
@@ -15,7 +16,7 @@ export const HlsPlayer: React.FC = () => {
       channel, currentChannel, playlist, setChannel,
     }))
   );
-  const { videoRef, handlePlayPause, isPlaying, setVolume, toggleMute } = usePlayer(channel);
+  const { videoRef, handlePlayPause, isPlaying, isMuted, isBuffering, setVolume, toggleMute } = usePlayer(channel);
   const containerRef = useRef<HTMLDivElement>(null);
   const hideOverlayTimeout = useRef<number | null>(null);
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
@@ -141,12 +142,19 @@ export const HlsPlayer: React.FC = () => {
             </Link>
           </div>
         }
+        centerPanel={isBuffering && (
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/40">
+            <Icon name="spinner" className="h-8 w-8 animate-spin text-white" />
+          </div>
+        )}
         bottomPanel={
           <div className="pointer-events-auto mt-auto bg-gradient-to-t from-black/70 via-black/45 to-transparent pb-3">
             <ChannelDetails />
             <PlayerControls
               isPlaying={isPlaying}
+              isMuted={isMuted}
               onPlayPause={handlePlayPause}
+              onToggleMute={toggleMute}
               onFullScreen={goFullScreen}
               onVolumeChange={setVolume}
               onPrev={() => navigateToChannel(currentChannel - 1)}

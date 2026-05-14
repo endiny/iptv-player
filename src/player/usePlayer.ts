@@ -6,6 +6,8 @@ export function usePlayer(channel: PlaylistItem | null) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
 
   const handlePlayPause = useCallback(() => {
     if (!videoRef.current || !channel) return;
@@ -34,6 +36,15 @@ export function usePlayer(channel: PlaylistItem | null) {
     if (!video || !channel) return;
 
     setIsPlaying(false);
+    setIsBuffering(true);
+
+    const onWaiting = () => setIsBuffering(true);
+    const onPlaying = () => setIsBuffering(false);
+    const onVolumeChange = () => setIsMuted(video.muted);
+
+    video.addEventListener('waiting', onWaiting);
+    video.addEventListener('playing', onPlaying);
+    video.addEventListener('volumechange', onVolumeChange);
 
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = channel.url;
@@ -52,6 +63,9 @@ export function usePlayer(channel: PlaylistItem | null) {
     }
 
     return () => {
+      video.removeEventListener('waiting', onWaiting);
+      video.removeEventListener('playing', onPlaying);
+      video.removeEventListener('volumechange', onVolumeChange);
       hlsRef.current?.destroy();
       hlsRef.current = null;
       video.pause();
@@ -60,5 +74,5 @@ export function usePlayer(channel: PlaylistItem | null) {
     };
   }, [channel]);
 
-  return { videoRef, isPlaying, handlePlayPause, setVolume, toggleMute };
+  return { videoRef, isPlaying, isMuted, isBuffering, handlePlayPause, setVolume, toggleMute };
 }
