@@ -8,7 +8,7 @@ import { getChannelCategory } from './playlist-utils';
 const CHANNELS_PER_PAGE = 16;
 const ALL_CATEGORIES = 'All categories';
 const paginationButtonClass =
-  'rounded-md border border-white/20 px-4 py-2 text-sm transition enabled:hover:border-sky-400 enabled:hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40';
+  'rounded-md border border-white/20 px-4 py-2.5 text-sm transition enabled:hover:border-sky-400 enabled:hover:text-sky-300 enabled:active:border-sky-400 enabled:active:text-sky-200 disabled:cursor-not-allowed disabled:opacity-40';
 
 type CategorizedChannel = {
   entry: PlaylistItem;
@@ -71,7 +71,7 @@ const PlaylistView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 text-white md:p-8">
+    <div className="min-h-dvh bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 text-white md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 rounded-3xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur-sm md:p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -81,11 +81,11 @@ const PlaylistView: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm">
-              <span className="text-slate-300">Category:</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex min-w-0 flex-1 items-center gap-2 text-sm sm:flex-none">
+              <span className="shrink-0 text-slate-300">Category:</span>
               <select
-                className="rounded-md border border-white/20 bg-slate-900/80 px-3 py-2 text-sm text-white"
+                className="min-w-0 flex-1 rounded-md border border-white/20 bg-slate-900/80 px-3 py-2 text-sm text-white sm:flex-none"
                 value={selectedCategory}
                 onChange={(event) => {
                   setSelectedCategory(event.target.value);
@@ -101,14 +101,14 @@ const PlaylistView: React.FC = () => {
             </label>
             <Link
               to="/settings"
-              className="rounded-md border border-white/20 px-3 py-2 text-sm text-slate-300 transition hover:border-sky-400 hover:text-sky-300"
+              className="rounded-md border border-white/20 px-3 py-2 text-sm text-slate-300 transition hover:border-sky-400 hover:text-sky-300 active:border-sky-400 active:text-sky-200"
             >
               Settings
             </Link>
           </div>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {pagedChannels.map(({ entry, index }) => (
             <ChannelCard
               key={`${index}-${entry.name}`}
@@ -125,9 +125,9 @@ const PlaylistView: React.FC = () => {
           </div>
         )}
 
-        <div className="flex items-center justify-between rounded-xl bg-slate-900/70 p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-900/70 p-3">
           <button
-            className={paginationButtonClass}
+            className={`${paginationButtonClass} order-1`}
             onClick={() => {
               setCurrentPage((page) => Math.max(1, page - 1));
             }}
@@ -137,12 +137,12 @@ const PlaylistView: React.FC = () => {
             Previous
           </button>
 
-          <span className="text-sm text-slate-300">
+          <span className="order-3 w-full text-center text-sm text-slate-300 sm:order-2 sm:w-auto">
             Page {currentPage} / {totalPages} · {channels.length} channels
           </span>
 
           <button
-            className={paginationButtonClass}
+            className={`${paginationButtonClass} order-2 sm:order-3`}
             onClick={() => {
               setCurrentPage((page) => Math.min(totalPages, page + 1));
             }}

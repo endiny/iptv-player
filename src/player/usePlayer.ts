@@ -52,6 +52,8 @@ export function usePlayer(channel: PlaylistItem | null) {
     const video = videoRef.current;
     if (!video || !channel) return;
 
+    video.setAttribute('webkit-playsinline', 'true');
+
     setIsPlaying(false);
     setIsBuffering(true);
 

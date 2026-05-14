@@ -12,10 +12,10 @@ interface PlayerControlsProps {
 }
 
 const controlButtonClass =
-  'flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white transition hover:bg-black/60';
+  'flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-black/30 text-white transition hover:bg-black/60 active:bg-black/70 md:h-10 md:w-10';
 
 export const PlayerControls: React.FC<PlayerControlsProps> = (p) => (
-  <div className="flex items-end justify-between gap-4 px-4 py-3 md:px-6">
+  <div className="flex flex-wrap items-end justify-between gap-3 px-4 py-3 md:flex-nowrap md:px-6">
     <div className="flex items-center gap-2">
       <button
         className={controlButtonClass}
@@ -53,7 +53,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = (p) => (
         <Icon name={p.isMuted ? 'volume-off' : 'volume'} />
       </button>
       <input
-        className="h-1 w-24 cursor-pointer accent-white md:w-32"
+        className="hidden h-1 w-24 cursor-pointer accent-white sm:block md:w-32"
         type="range"
         min={0}
         max={100}

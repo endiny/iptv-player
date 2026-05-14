@@ -30,12 +30,37 @@ export const HlsPlayer: React.FC = () => {
   const { isOverlayVisible, showOverlay } = useOverlayVisibility(OVERLAY_IDLE_TIMEOUT_MS);
 
   const goFullScreen = useCallback(() => {
-    if (document.fullscreenElement === null) {
-      containerRef.current?.requestFullscreen();
-    } else {
-      document.exitFullscreen();
+    const container = containerRef.current;
+    const video = videoRef.current as
+      | (HTMLVideoElement & {
+          webkitEnterFullscreen?: () => void;
+          webkitExitFullscreen?: () => void;
+          webkitDisplayingFullscreen?: boolean;
+        })
+      | null;
+    if (!container || !video) return;
+
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => undefined);
+      return;
     }
-  }, []);
+    if (video.webkitDisplayingFullscreen) {
+      video.webkitExitFullscreen?.();
+      return;
+    }
+
+    // iOS WebKit (iPhone/iPad Safari, iOS Chrome): only the <video> can go fullscreen,
+    // and webkitEnterFullscreen must run synchronously inside the user gesture —
+    // a Promise .catch fallback fires too late and iOS rejects it.
+    const isIosWebKit =
+      typeof video.webkitEnterFullscreen === 'function' && 'ontouchend' in document;
+    if (isIosWebKit) {
+      video.webkitEnterFullscreen?.();
+      return;
+    }
+
+    container.requestFullscreen?.().catch(() => undefined);
+  }, [videoRef]);
 
   // Restore channel from URL on mount
   useEffect(() => {
@@ -83,7 +108,16 @@ export const HlsPlayer: React.FC = () => {
   const handleContainerClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.closest('button') || target.closest('a') || target.closest('input')) return;
-    handlePlayPause();
+    const hasHover = window.matchMedia('(hover: hover)').matches;
+    if (hasHover) {
+      handlePlayPause();
+      return;
+    }
+    if (!isOverlayVisible) {
+      showOverlay();
+    } else {
+      handlePlayPause();
+    }
   };
 
   return (
@@ -94,9 +128,10 @@ export const HlsPlayer: React.FC = () => {
       aria-label="HLS player"
       onMouseMove={showOverlay}
       onMouseEnter={showOverlay}
+      onTouchStart={showOverlay}
       onClick={handleContainerClick}
     >
-      <video ref={videoRef} controls={false} className="hls-video" preload="none" />
+      <video ref={videoRef} controls={false} className="hls-video" preload="none" playsInline />
 
       <PlayerOverlay
         className={`pointer-events-none transition-opacity duration-300 ${isOverlayVisible ? 'opacity-100' : 'opacity-0'}`}

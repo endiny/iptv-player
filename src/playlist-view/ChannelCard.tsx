@@ -13,7 +13,7 @@ export const ChannelCard: React.FC<ChannelCardProps> = ({ entry, index, onClick 
 
   return (
     <button
-      className="flex min-h-20 items-center gap-3 rounded-xl border border-white/10 bg-slate-900/70 p-3 text-left transition hover:border-sky-400 hover:bg-slate-800/80 focus-visible:ring-2 focus-visible:ring-sky-400 md:min-h-36 md:flex-col md:justify-between"
+      className="flex min-h-20 items-center gap-3 rounded-xl border border-white/10 bg-slate-900/70 p-3 text-left transition hover:border-sky-400 hover:bg-slate-800/80 focus-visible:ring-2 focus-visible:ring-sky-400 active:border-sky-400 active:bg-slate-800/80 md:min-h-36 md:flex-col md:justify-between"
       onClick={() => onClick(index)}
       type="button"
     >
