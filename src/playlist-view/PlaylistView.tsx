@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useIptvPlaylist } from '../stores/use-iptv-playlist';
 import { useNavigate, Link } from 'react-router';
 import type { PlaylistItem } from 'iptv-playlist-parser';
+import { ChannelCard } from './ChannelCard';
+import { getChannelCategory } from './playlist-utils';
 
 const CHANNELS_PER_PAGE = 16;
 const ALL_CATEGORIES = 'All categories';
@@ -107,37 +109,14 @@ const PlaylistView: React.FC = () => {
         </div>
 
         <div className="grid gap-3 md:grid-cols-4">
-          {pagedChannels.map(({ entry, index }) => {
-            const logoSrc = entry.tvg?.logo ?? '';
-            const displayName = entry.name || entry.tvg?.name || 'Unnamed channel';
-
-            return (
-              <button
-                key={`${index}-${displayName}`}
-                className="flex min-h-20 items-center gap-3 rounded-xl border border-white/10 bg-slate-900/70 p-3 text-left transition hover:border-sky-400 hover:bg-slate-800/80 focus-visible:ring-2 focus-visible:ring-sky-400 md:min-h-36 md:flex-col md:justify-between"
-                onClick={() => {
-                  onChannelClick(index);
-                }}
-                type="button"
-              >
-                {logoSrc ? (
-                  <img
-                    className="h-12 w-12 shrink-0 rounded-md object-cover md:h-16 md:w-16"
-                    src={logoSrc}
-                    alt={`${displayName} logo`}
-                  />
-                ) : (
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-white/10 text-xl md:h-16 md:w-16">
-                    📺
-                  </div>
-                )}
-
-                <span className="text-sm font-medium text-slate-100 md:text-center md:text-base">
-                  {displayName}
-                </span>
-              </button>
-            );
-          })}
+          {pagedChannels.map(({ entry, index }) => (
+            <ChannelCard
+              key={`${index}-${entry.name}`}
+              entry={entry}
+              index={index}
+              onClick={onChannelClick}
+            />
+          ))}
         </div>
 
         {pagedChannels.length === 0 && (
@@ -177,20 +156,5 @@ const PlaylistView: React.FC = () => {
     </div>
   );
 };
-
-function getChannelCategory(channel: PlaylistItem): string {
-  const channelRecord = channel as PlaylistItem & {
-    group?: { title?: string };
-    groupTitle?: string;
-    attrs?: Record<string, string>;
-  };
-
-  return (
-    channelRecord.group?.title ??
-    channelRecord.groupTitle ??
-    channelRecord.attrs?.['group-title'] ??
-    ''
-  ).trim();
-}
 
 export default PlaylistView;

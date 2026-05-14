@@ -53,5 +53,13 @@ export function useKeyboardShortcuts({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onPlayPause, onPrevChannel, onNextChannel, onFullScreen, onToggleMute, onNavigateHome, onShowOverlay]);
+  }, [
+    onPlayPause,
+    onPrevChannel,
+    onNextChannel,
+    onFullScreen,
+    onToggleMute,
+    onNavigateHome,
+    onShowOverlay,
+  ]);
 }
