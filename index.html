@@ -5,6 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>iptv-player</title>
+    <script>
+      // Restore path encoded by 404.html (/?/player → /player).
+      (function () {
+        var redirect = window.location.search.slice(1);
+        if (redirect.startsWith('/')) {
+          var parts = redirect.split('&');
+          var path = parts[0];
+          var query = parts.slice(1).join('&');
+          window.history.replaceState(
+            null,
+            null,
+            path + (query ? '?' + query : '') + window.location.hash,
+          );
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
