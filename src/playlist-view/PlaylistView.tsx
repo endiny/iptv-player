@@ -13,7 +13,7 @@ type CategorizedChannel = {
 
 const PlaylistView: React.FC = () => {
   const playlist = useIptvPlaylist(state => state.playlist!);
-  const setChannel = useIptvPlaylist(state => state.setChannel!);
+  const setChannel = useIptvPlaylist(state => state.setChannel);
   const navigate = useNavigate();
 
   const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);

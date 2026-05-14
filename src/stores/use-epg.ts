@@ -4,18 +4,14 @@ import { create } from "zustand";
 
 interface EpgState {
   epgStore: ProgrammesIndex | null;
-  customMappers: Record<string, string>;
   getCurrentProgramme: (channelId: string) => XmltvProgramme | null;
-  setCustomMappers: (mappers: Record<string, string>) => void;
   fetchEpg: (urls: readonly string[]) => Promise<void>;
   clearEpg: () => void;
-  clearMappers: () => void;
 }
 
 export const useEpg = create<EpgState>((set, get) => {
   return {
     epgStore: null,
-    customMappers: {},
     fetchEpg: async (urls: readonly string[]) => {
       const newEpgStore: Record<string, Xmltv> = {};
 
@@ -51,7 +47,6 @@ export const useEpg = create<EpgState>((set, get) => {
         }
       }
 
-      console.log(newEpgStore);
       set(() => ({ epgStore: createProgrammesIndex(newEpgStore) }));
     },
     getCurrentProgramme: (channelId: string) => {
@@ -59,14 +54,8 @@ export const useEpg = create<EpgState>((set, get) => {
       if (!store) return null;
       return getCurrentProgrammeForChannel(channelId, store);
     },
-    setCustomMappers: (customMappers: Record<string, string>) => {
-      set({ customMappers });
-    },
     clearEpg: () => {
       set({ epgStore: null });
-    },
-    clearMappers: () => {
-      set({ customMappers: {} });
     },
   };
 });

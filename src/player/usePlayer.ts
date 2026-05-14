@@ -8,19 +8,18 @@ export function usePlayer(channel: PlaylistItem | null) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handlePlayPause = useCallback(() => {
-    if (!videoRef.current || !channel) {
-      return;
-    }
+    if (!videoRef.current || !channel) return;
 
-    if (isPlaying) {
+    if (!videoRef.current.paused) {
       videoRef.current.pause();
       hlsRef.current?.stopLoad();
+      setIsPlaying(false);
     } else {
       hlsRef.current?.startLoad();
-      videoRef.current.play();
+      videoRef.current.play().catch((err) => console.warn("Autoplay blocked:", err));
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
-  }, [channel, isPlaying]);
+  }, [channel]);
 
   const setVolume = (volume: number) =>
     videoRef.current && (videoRef.current.volume = volume);
@@ -33,7 +32,7 @@ export function usePlayer(channel: PlaylistItem | null) {
 
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = channel.url;
-      video.play();
+      video.play().catch((err) => console.warn("Autoplay blocked:", err));
       setIsPlaying(true);
     } else if (Hls.isSupported()) {
       const hls = new Hls();
@@ -41,7 +40,7 @@ export function usePlayer(channel: PlaylistItem | null) {
       hls.loadSource(channel.url);
       hls.attachMedia(video);
       hls.startLoad();
-      video.play();
+      video.play().catch((err) => console.warn("Autoplay blocked:", err));
       setIsPlaying(true);
     } else {
       console.error("HLS is not supported by this browser");
@@ -53,7 +52,6 @@ export function usePlayer(channel: PlaylistItem | null) {
       video.pause();
       video.removeAttribute("src");
       video.load();
-      setIsPlaying(false);
     };
   }, [channel]);
 

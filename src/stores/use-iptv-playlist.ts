@@ -7,6 +7,7 @@ interface IptvPlaylistState {
   playlist: Playlist | null;
   channel: PlaylistItem | null;
   currentChannel: number;
+  error: string | null;
   fetchPlaylist: (url: string) => Promise<void>;
   loadPlaylistFromFile: (file: File) => Promise<void>;
   setChannel: (index: number) => void;
@@ -18,13 +19,14 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set, get) => {
   let restoredPlaylist: Playlist | null = null;
   if (savedPlaylistStr) {
     restoredPlaylist = JSON.parse(savedPlaylistStr) as Playlist;
-    fetchEpgFromPlaylist(restoredPlaylist);
+    queueMicrotask(() => fetchEpgFromPlaylist(restoredPlaylist!));
   }
     
   return {
     playlist: restoredPlaylist,
     channel: null,
     currentChannel: 0,
+    error: null,
     fetchPlaylist: async (url: string) => {
       try {
         const response = await fetch(url);
@@ -33,17 +35,19 @@ export const useIptvPlaylist = create<IptvPlaylistState>((set, get) => {
         }
         const data = await response.text();
         const parsed = processPlaylistData(data);
-        set({ playlist: parsed });
+        set({ playlist: parsed, error: null });
       } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to load playlist';
         console.error("Error fetching playlist:", error);
-        set({ playlist: null });
+        set({ playlist: null, error: message });
+        throw error;
       }
     },
     loadPlaylistFromFile: async (file: File) => {
       try {
         const text = await file.text();
         const parsed = processPlaylistData(text);
-        set({ playlist: parsed });
+        set({ playlist: parsed, error: null });
       } catch (error) {
         console.error("Error loading playlist from file:", error);
         set({ playlist: null });

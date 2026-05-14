@@ -1,7 +1,7 @@
 import { useIptvPlaylist } from "@/stores/use-iptv-playlist";
 import { useShallow } from "zustand/react/shallow";
 
-interface P {
+interface PlayerControlsProps {
   isPlaying: boolean;
   onPlayPause: () => void;
   onFullScreen: () => void;
@@ -11,7 +11,7 @@ interface P {
 const controlButtonClass =
   "flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/30 text-lg text-white transition hover:bg-black/60";
 
-export const PlayerControls: React.FC<P> = (p) => {
+export const PlayerControls: React.FC<PlayerControlsProps> = (p) => {
   const { currentChannel, setChannel } = useIptvPlaylist(
     useShallow(({ currentChannel, setChannel }) => ({ currentChannel, setChannel }))
   );

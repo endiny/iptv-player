@@ -3,9 +3,11 @@ import { useIptvPlaylist } from "@/stores/use-iptv-playlist";
 import { useMemo } from "react";
 
 export const ChannelDetails: React.FC = () => {
-  const channel = useIptvPlaylist((state) => state.channel!);
+  const channel = useIptvPlaylist((state) => state.channel);
   const getCurrentProgramme = useEpg((state) => state.getCurrentProgramme);
-  const currentProgramme = useMemo(() => getCurrentProgramme(channel.tvg.id ?? ""), [channel, getCurrentProgramme]);
+  const currentProgramme = useMemo(() => getCurrentProgramme(channel?.tvg?.id ?? ""), [channel, getCurrentProgramme]);
+
+  if (!channel) return null;
 
   const logoSrc = channel?.tvg?.logo ?? "";
   const channelDisplayName = channel?.name || channel?.tvg?.name || "";

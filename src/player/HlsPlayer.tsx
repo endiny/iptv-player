@@ -15,13 +15,13 @@ export const HlsPlayer: React.FC = () => {
   const hideOverlayTimeout = useRef<number | null>(null);
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
 
-  const goFullScreen = () => {
+  const goFullScreen = useCallback(() => {
     if (document.fullscreenElement === null) {
       containerRef.current?.requestFullscreen();
     } else {
       document.exitFullscreen();
     }
-  };
+  }, []);
 
   const scheduleOverlayHide = useCallback(() => {
     if (hideOverlayTimeout.current !== null) {
@@ -77,7 +77,6 @@ export const HlsPlayer: React.FC = () => {
         ref={videoRef}
         controls={false}
         className="hls-video"
-        style={{ background: "#000" }}
         preload="none"
       />
 
