@@ -2,12 +2,15 @@ import Hls from "hls.js";
 import type { PlaylistItem } from "iptv-playlist-parser";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const STALE_PAUSE_THRESHOLD_MS = 5000;
+
 export function usePlayer(channel: PlaylistItem | null) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
+  const pausedAtRef = useRef<number | null>(null);
 
   const handlePlayPause = useCallback(() => {
     if (!videoRef.current || !channel) return;
@@ -15,9 +18,24 @@ export function usePlayer(channel: PlaylistItem | null) {
     if (!videoRef.current.paused) {
       videoRef.current.pause();
       hlsRef.current?.stopLoad();
+      pausedAtRef.current = Date.now();
       setIsPlaying(false);
     } else {
-      hlsRef.current?.startLoad();
+      const pausedDuration = pausedAtRef.current !== null ? Date.now() - pausedAtRef.current : 0;
+      pausedAtRef.current = null;
+
+      if (pausedDuration >= STALE_PAUSE_THRESHOLD_MS && hlsRef.current) {
+        // Buffer is stale; destroy and reload from the live edge
+        hlsRef.current.destroy();
+        const hls = new Hls();
+        hlsRef.current = hls;
+        hls.loadSource(channel.url);
+        hls.attachMedia(videoRef.current);
+        hls.startLoad(-1);
+      } else {
+        hlsRef.current?.startLoad();
+      }
+
       videoRef.current.play().catch((err) => console.warn("Autoplay blocked:", err));
       setIsPlaying(true);
     }
