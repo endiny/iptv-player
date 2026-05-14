@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useIptvPlaylist } from '../stores/use-iptv-playlist';
 import { useNavigate, Link } from 'react-router';
 import type { PlaylistItem } from 'iptv-playlist-parser';
+import { ChannelCard } from './ChannelCard';
+import { getChannelCategory } from './playlist-utils';
 
 const CHANNELS_PER_PAGE = 16;
 const ALL_CATEGORIES = 'All categories';
 const paginationButtonClass =
-  "rounded-md border border-white/20 px-4 py-2 text-sm transition enabled:hover:border-sky-400 enabled:hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40";
+  'rounded-md border border-white/20 px-4 py-2 text-sm transition enabled:hover:border-sky-400 enabled:hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-40';
 
 type CategorizedChannel = {
   entry: PlaylistItem;
@@ -14,8 +16,8 @@ type CategorizedChannel = {
 };
 
 const PlaylistView: React.FC = () => {
-  const playlist = useIptvPlaylist(state => state.playlist!);
-  const setChannel = useIptvPlaylist(state => state.setChannel);
+  const playlist = useIptvPlaylist((state) => state.playlist!);
+  const setChannel = useIptvPlaylist((state) => state.setChannel);
   const navigate = useNavigate();
 
   const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
@@ -23,10 +25,13 @@ const PlaylistView: React.FC = () => {
 
   const categories = useMemo(() => {
     const categoryValues = playlist.items
-      .map(channel => getChannelCategory(channel))
+      .map((channel) => getChannelCategory(channel))
       .filter((category): category is string => category.length > 0);
 
-    return [ALL_CATEGORIES, ...Array.from(new Set(categoryValues)).sort((a, b) => a.localeCompare(b))];
+    return [
+      ALL_CATEGORIES,
+      ...Array.from(new Set(categoryValues)).sort((a, b) => a.localeCompare(b)),
+    ];
   }, [playlist.items]);
 
   useEffect(() => {
@@ -51,7 +56,7 @@ const PlaylistView: React.FC = () => {
   const totalPages = Math.max(1, Math.ceil(channels.length / CHANNELS_PER_PAGE));
 
   useEffect(() => {
-    setCurrentPage(previous => Math.min(previous, totalPages));
+    setCurrentPage((previous) => Math.min(previous, totalPages));
   }, [totalPages]);
 
   const pagedChannels = useMemo(() => {
@@ -71,26 +76,28 @@ const PlaylistView: React.FC = () => {
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold">Channels</h1>
-            <p className="text-sm text-slate-300">Browse by category and open channels instantly.</p>
+            <p className="text-sm text-slate-300">
+              Browse by category and open channels instantly.
+            </p>
           </div>
 
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-sm">
-            <span className="text-slate-300">Category:</span>
-            <select
-              className="rounded-md border border-white/20 bg-slate-900/80 px-3 py-2 text-sm text-white"
-              value={selectedCategory}
-              onChange={event => {
-                setSelectedCategory(event.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              {categories.map(category => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
+              <span className="text-slate-300">Category:</span>
+              <select
+                className="rounded-md border border-white/20 bg-slate-900/80 px-3 py-2 text-sm text-white"
+                value={selectedCategory}
+                onChange={(event) => {
+                  setSelectedCategory(event.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </label>
             <Link
               to="/settings"
@@ -102,29 +109,14 @@ const PlaylistView: React.FC = () => {
         </div>
 
         <div className="grid gap-3 md:grid-cols-4">
-          {pagedChannels.map(({ entry, index }) => {
-            const logoSrc = entry.tvg?.logo ?? '';
-            const displayName = entry.name || entry.tvg?.name || 'Unnamed channel';
-
-            return (
-              <button
-                key={`${index}-${displayName}`}
-                className="flex min-h-20 items-center gap-3 rounded-xl border border-white/10 bg-slate-900/70 p-3 text-left transition hover:border-sky-400 hover:bg-slate-800/80 focus-visible:ring-2 focus-visible:ring-sky-400 md:min-h-36 md:flex-col md:justify-between"
-                onClick={() => {
-                  onChannelClick(index);
-                }}
-                type="button"
-              >
-                {logoSrc ? (
-                  <img className="h-12 w-12 shrink-0 rounded-md object-cover md:h-16 md:w-16" src={logoSrc} alt={`${displayName} logo`} />
-                ) : (
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-white/10 text-xl md:h-16 md:w-16">📺</div>
-                )}
-
-                <span className="text-sm font-medium text-slate-100 md:text-center md:text-base">{displayName}</span>
-              </button>
-            );
-          })}
+          {pagedChannels.map(({ entry, index }) => (
+            <ChannelCard
+              key={`${index}-${entry.name}`}
+              entry={entry}
+              index={index}
+              onClick={onChannelClick}
+            />
+          ))}
         </div>
 
         {pagedChannels.length === 0 && (
@@ -137,7 +129,7 @@ const PlaylistView: React.FC = () => {
           <button
             className={paginationButtonClass}
             onClick={() => {
-              setCurrentPage(page => Math.max(1, page - 1));
+              setCurrentPage((page) => Math.max(1, page - 1));
             }}
             disabled={currentPage === 1}
             type="button"
@@ -152,7 +144,7 @@ const PlaylistView: React.FC = () => {
           <button
             className={paginationButtonClass}
             onClick={() => {
-              setCurrentPage(page => Math.min(totalPages, page + 1));
+              setCurrentPage((page) => Math.min(totalPages, page + 1));
             }}
             disabled={currentPage === totalPages}
             type="button"
@@ -164,20 +156,5 @@ const PlaylistView: React.FC = () => {
     </div>
   );
 };
-
-function getChannelCategory(channel: PlaylistItem): string {
-  const channelRecord = channel as PlaylistItem & {
-    group?: { title?: string };
-    groupTitle?: string;
-    attrs?: Record<string, string>;
-  };
-
-  return (
-    channelRecord.group?.title ??
-    channelRecord.groupTitle ??
-    channelRecord.attrs?.['group-title'] ??
-    ''
-  ).trim();
-}
 
 export default PlaylistView;

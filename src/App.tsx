@@ -4,7 +4,7 @@ import { Route, Routes } from 'react-router';
 
 const Main = lazy(() => import('./playlist-view/Main'));
 const HlsPlayer = lazy(() =>
-  import('./player/HlsPlayer').then((module) => ({ default: module.HlsPlayer }))
+  import('./player/HlsPlayer').then((module) => ({ default: module.HlsPlayer })),
 );
 const Settings = lazy(() => import('./settings/Settings'));
 

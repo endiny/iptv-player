@@ -1,6 +1,6 @@
-import type { Xmltv, XmltvProgramme } from "@iptv/xmltv";
-import { parseXmltv } from "@iptv/xmltv";
-import { create } from "zustand";
+import type { Xmltv, XmltvProgramme } from '@iptv/xmltv';
+import { parseXmltv } from '@iptv/xmltv';
+import { create } from 'zustand';
 
 interface EpgState {
   epgStore: ProgrammesIndex | null;
@@ -19,10 +19,7 @@ export const useEpg = create<EpgState>((set, get) => {
         return;
       }
 
-      const fetchPromises = urls.map((url) =>
-        fetch(url)
-          .then((res) => ({ res, url }))
-      );
+      const fetchPromises = urls.map((url) => fetch(url).then((res) => ({ res, url })));
 
       const settled = await Promise.allSettled(fetchPromises);
 
@@ -67,7 +64,7 @@ function createProgrammesIndex(epgStore: Record<string, Xmltv>): ProgrammesIndex
 
   for (const [k, v] of Object.entries(epgStore)) {
     const index = new Map<string, XmltvProgramme[]>();
-    for (const programme of (v.programmes ?? [])) {
+    for (const programme of v.programmes ?? []) {
       const channelId = programme.channel;
       const existing = index.get(channelId) ?? [];
       existing.push(programme);
@@ -79,7 +76,10 @@ function createProgrammesIndex(epgStore: Record<string, Xmltv>): ProgrammesIndex
   return res;
 }
 
-function getCurrentProgrammeForChannel(channelId: string, programmesIndex: ProgrammesIndex): XmltvProgramme | null {
+function getCurrentProgrammeForChannel(
+  channelId: string,
+  programmesIndex: ProgrammesIndex,
+): XmltvProgramme | null {
   const now = new Date();
   for (const programmesMap of programmesIndex.values()) {
     const programmes = programmesMap.get(channelId);

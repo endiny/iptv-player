@@ -1,27 +1,33 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useIptvPlaylist } from "../stores/use-iptv-playlist";
-import { PlayerOverlay } from "./overlay/PlayerOverlay";
-import { PlayerControls } from "./overlay/PlayerControls";
-import { usePlayer } from "./usePlayer";
-import { ChannelDetails } from "./overlay/ChannelDetails";
-import { Link, useNavigate, useSearchParams } from "react-router";
-import { Icon } from "@/icons";
-import { useShallow } from "zustand/react/shallow";
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useIptvPlaylist } from '../stores/use-iptv-playlist';
+import { PlayerOverlay } from './overlay/PlayerOverlay';
+import { PlayerControls } from './overlay/PlayerControls';
+import { usePlayer } from './usePlayer';
+import { ChannelDetails } from './overlay/ChannelDetails';
+import { Link, useNavigate, useSearchParams } from 'react-router';
+import { Icon } from '@/icons';
+import { useShallow } from 'zustand/react/shallow';
+import { useOverlayVisibility } from './useOverlayVisibility';
+import { useKeyboardShortcuts } from './useKeyboardShortcuts';
 
 const OVERLAY_IDLE_TIMEOUT_MS = 3000;
 
 export const HlsPlayer: React.FC = () => {
   const { channel, currentChannel, playlist, setChannel } = useIptvPlaylist(
     useShallow(({ channel, currentChannel, playlist, setChannel }) => ({
-      channel, currentChannel, playlist, setChannel,
-    }))
+      channel,
+      currentChannel,
+      playlist,
+      setChannel,
+    })),
   );
-  const { videoRef, handlePlayPause, isPlaying, isMuted, isBuffering, setVolume, toggleMute } = usePlayer(channel);
+  const { videoRef, handlePlayPause, isPlaying, isMuted, isBuffering, setVolume, toggleMute } =
+    usePlayer(channel);
   const containerRef = useRef<HTMLDivElement>(null);
-  const hideOverlayTimeout = useRef<number | null>(null);
-  const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  const { isOverlayVisible, showOverlay } = useOverlayVisibility(OVERLAY_IDLE_TIMEOUT_MS);
 
   const goFullScreen = useCallback(() => {
     if (document.fullscreenElement === null) {
@@ -30,29 +36,6 @@ export const HlsPlayer: React.FC = () => {
       document.exitFullscreen();
     }
   }, []);
-
-  const scheduleOverlayHide = useCallback(() => {
-    if (hideOverlayTimeout.current !== null) {
-      window.clearTimeout(hideOverlayTimeout.current);
-    }
-    hideOverlayTimeout.current = window.setTimeout(() => {
-      setIsOverlayVisible(false);
-    }, OVERLAY_IDLE_TIMEOUT_MS);
-  }, []);
-
-  const showOverlay = useCallback(() => {
-    setIsOverlayVisible(true);
-    scheduleOverlayHide();
-  }, [scheduleOverlayHide]);
-
-  useEffect(() => {
-    showOverlay();
-    return () => {
-      if (hideOverlayTimeout.current !== null) {
-        window.clearTimeout(hideOverlayTimeout.current);
-      }
-    };
-  }, [showOverlay]);
 
   // Restore channel from URL on mount
   useEffect(() => {
@@ -63,52 +46,39 @@ export const HlsPlayer: React.FC = () => {
       return;
     }
     setChannel(index);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const navigateToChannel = useCallback((index: number) => {
-    if (!playlist) return;
-    const size = playlist.items.length;
-    const normalized = ((index % size) + size) % size;
-    setChannel(normalized);
-    setSearchParams({ ch: String(normalized) }, { replace: true });
-  }, [playlist, setChannel, setSearchParams]);
+  const navigateToChannel = useCallback(
+    (index: number) => {
+      if (!playlist) return;
+      const size = playlist.items.length;
+      const normalized = ((index % size) + size) % size;
+      setChannel(normalized);
+      setSearchParams({ ch: String(normalized) }, { replace: true });
+    },
+    [playlist, setChannel, setSearchParams],
+  );
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case ' ':
-          e.preventDefault();
-          handlePlayPause();
-          showOverlay();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          navigateToChannel(currentChannel - 1);
-          showOverlay();
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          navigateToChannel(currentChannel + 1);
-          showOverlay();
-          break;
-        case 'f':
-        case 'F':
-          goFullScreen();
-          break;
-        case 'm':
-        case 'M':
-          toggleMute();
-          break;
-        case 'Escape':
-          navigate('/');
-          break;
-      }
-    };
+  const onPrevChannel = useCallback(
+    () => navigateToChannel(currentChannel - 1),
+    [navigateToChannel, currentChannel],
+  );
+  const onNextChannel = useCallback(
+    () => navigateToChannel(currentChannel + 1),
+    [navigateToChannel, currentChannel],
+  );
+  const onNavigateHome = useCallback(() => navigate('/'), [navigate]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePlayPause, showOverlay, goFullScreen, currentChannel, navigateToChannel, toggleMute, navigate]);
+  useKeyboardShortcuts({
+    onPlayPause: handlePlayPause,
+    onPrevChannel,
+    onNextChannel,
+    onFullScreen: goFullScreen,
+    onToggleMute: toggleMute,
+    onNavigateHome,
+    onShowOverlay: showOverlay,
+  });
 
   const handleContainerClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -126,15 +96,10 @@ export const HlsPlayer: React.FC = () => {
       onMouseEnter={showOverlay}
       onClick={handleContainerClick}
     >
-      <video
-        ref={videoRef}
-        controls={false}
-        className="hls-video"
-        preload="none"
-      />
+      <video ref={videoRef} controls={false} className="hls-video" preload="none" />
 
       <PlayerOverlay
-        className={`pointer-events-none transition-opacity duration-300 ${isOverlayVisible ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none transition-opacity duration-300 ${isOverlayVisible ? 'opacity-100' : 'opacity-0'}`}
         topPanel={
           <div className="pointer-events-auto p-4">
             <Link
@@ -145,11 +110,13 @@ export const HlsPlayer: React.FC = () => {
             </Link>
           </div>
         }
-        centerPanel={isBuffering && (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/40">
-            <Icon name="spinner" className="h-8 w-8 animate-spin text-white" />
-          </div>
-        )}
+        centerPanel={
+          isBuffering && (
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/40">
+              <Icon name="spinner" className="h-8 w-8 animate-spin text-white" />
+            </div>
+          )
+        }
         bottomPanel={
           <div className="pointer-events-auto mt-auto bg-gradient-to-t from-black/70 via-black/45 to-transparent pb-3">
             <ChannelDetails />
@@ -160,8 +127,8 @@ export const HlsPlayer: React.FC = () => {
               onToggleMute={toggleMute}
               onFullScreen={goFullScreen}
               onVolumeChange={setVolume}
-              onPrev={() => navigateToChannel(currentChannel - 1)}
-              onNext={() => navigateToChannel(currentChannel + 1)}
+              onPrev={onPrevChannel}
+              onNext={onNextChannel}
             />
           </div>
         }
