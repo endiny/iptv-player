@@ -100,12 +100,15 @@ export const HlsPlayer: React.FC = () => {
         case 'M':
           toggleMute();
           break;
+        case 'Escape':
+          navigate('/');
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePlayPause, showOverlay, goFullScreen, currentChannel, navigateToChannel, toggleMute]);
+  }, [handlePlayPause, showOverlay, goFullScreen, currentChannel, navigateToChannel, toggleMute, navigate]);
 
   const handleContainerClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
