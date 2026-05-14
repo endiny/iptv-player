@@ -24,6 +24,11 @@ export function usePlayer(channel: PlaylistItem | null) {
   const setVolume = (volume: number) =>
     videoRef.current && (videoRef.current.volume = volume);
 
+  const toggleMute = useCallback(() => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoRef.current.muted;
+  }, []);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !channel) return;
@@ -55,5 +60,5 @@ export function usePlayer(channel: PlaylistItem | null) {
     };
   }, [channel]);
 
-  return { videoRef, isPlaying, handlePlayPause, setVolume };
+  return { videoRef, isPlaying, handlePlayPause, setVolume, toggleMute };
 }
