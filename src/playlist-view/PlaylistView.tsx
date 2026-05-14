@@ -62,7 +62,7 @@ const PlaylistView: React.FC = () => {
 
   const onChannelClick = (index: number) => {
     setChannel(index);
-    navigate('/player');
+    navigate(`/player?ch=${index}`);
   };
 
   return (
